@@ -18,6 +18,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('proprietario', function() {
-    return 'teste';
-});
+Route::apiResource('proprietario', 'App\Http\Controllers\ProprietarioController');
