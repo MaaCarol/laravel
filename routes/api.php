@@ -1,18 +1,9 @@
+<?php
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PostController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Aqui você registra as rotas da sua API. Elas já estão automaticamente
-| prefixadas com /api, então /register na verdade responde em
-| http://127.0.0.1:8000/api/register
-|
-*/
 
 // 🔹 Cadastro de usuário
 Route::post('/register', [UsuarioController::class, 'registrar']);
@@ -29,12 +20,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/editar', [UsuarioController::class, 'editar']);
         Route::post('/perfil', [UsuarioController::class, 'perfil']);
         Route::post('/desativar-conta', [UsuarioController::class, 'desativarConta']);
-        Route::post('/foto-upload', [UsuarioController::class, 'fotoUpload']);
     });
 
     // Posts
     Route::prefix('posts')->group(function () {
-        Route::get('/', [PostController::class, 'index']); // Listar posts
-        Route::post('/', [PostController::class, 'store']); // Criar post
+        Route::get('/', [PostController::class, 'index']); // Listar postagens
+        Route::post('/', [PostController::class, 'store']); // Criar postagem
     });
 });
