@@ -23,6 +23,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+       
     }
 
     /**
@@ -30,6 +32,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        
+        Schema::table('posts', function(Blueprint $table){
+            $table->dropForeign('posts_user_id_foreign');
+            $table->dropColumn('user_id');
+        });
+
         Schema::dropIfExists('users');
     }
 };

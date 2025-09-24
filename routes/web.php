@@ -17,4 +17,3 @@ Route::get('/', [App\Http\Controllers\Principal::class, 'principal']);
 
 
 
-

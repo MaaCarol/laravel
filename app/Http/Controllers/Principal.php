@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 class Principal extends Controller
 {
     function principal(){
-        echo 'Página Principal';
+        echo 'pagina principal';
+    }
+
+    function teste(){
+        echo 'Rota de teste';
     }
 }
-
-
