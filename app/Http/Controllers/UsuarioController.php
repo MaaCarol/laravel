@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
-   
-    function registrar(Request $request) 
+    // 🔹 Cadastro
+    public function registrar(Request $request)
     {
         $dados = $request->validate([
             'name' => 'required|string|max:255',
@@ -17,16 +17,14 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:6|confirmed'
         ]);
 
-        $dados['password'] = bcrypt($dados['password']);
-        $dados['picture'] = 'https://cdn0.iconfinder.com/data/icons/seo-web-4-1/128/Vigor_User-Avatar-Profile-Photo-02-1024.png';
-        $dados['status'] = 'active';
-        $dados['enabled'] = true;
-        $dados['tipo'] = 'admin';
+        $dados['password'] = Hash::make($dados['password']);
+        $dados['picture'] = $request->picture ?? 'https://cdn0.iconfinder.com/data/icons/seo-web-4-1/128/Vigor_User-Avatar-Profile-Photo-02-1024.png';
+        $dados['status'] = $request->status ?? 'active';
+        $dados['enabled'] = $request->enabled ?? 'true';
+        $dados['tipo'] = $request->tipo ?? 'admin';
 
         $usuario = User::create($dados);
-
         $token = $usuario->createToken('auth_token')->plainTextToken;
-        
 
         return response()->json([
             'message' => 'Usuário registrado com sucesso.',
@@ -35,7 +33,8 @@ class UsuarioController extends Controller
         ], 201);
     }
 
-    function login(Request $request)
+    // 🔹 Login
+    public function login(Request $request)
     {
         $credenciais = $request->validate([
             'email' => 'required|email',
@@ -44,7 +43,7 @@ class UsuarioController extends Controller
 
         $usuario = User::where('email', $credenciais['email'])->first();
 
-        if (!$usuario || !\Hash::check($credenciais['password'], $usuario->password)) {
+        if (!$usuario || !Hash::check($credenciais['password'], $usuario->password)) {
             return response()->json(['message' => 'Credenciais inválidas'], 401);
         }
 
@@ -57,16 +56,16 @@ class UsuarioController extends Controller
         ]);
     }
 
-
-    function logout(Request $request)
+    // 🔹 Logout
+    public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logout realizado com sucesso.']);
     }
 
-
-    function fotoUpload(Request $request)
+    // 🔹 Upload de foto
+    public function fotoUpload(Request $request)
     {
         $request->validate([
             'picture' => 'required|image|mimes:jpg,jpeg,png|max:2048'
@@ -83,8 +82,8 @@ class UsuarioController extends Controller
         ]);
     }
 
-
-    function desativarConta(Request $request)
+    // 🔹 Desativar conta
+    public function desativarConta(Request $request)
     {
         $usuario = $request->user();
         $usuario->update(['enabled' => false, 'status' => 'inactive']);
@@ -92,23 +91,29 @@ class UsuarioController extends Controller
         return response()->json(['message' => 'Conta desativada com sucesso.']);
     }
 
-    function perfil(Request $request)
+    // 🔹 Perfil do usuário
+    public function perfil(Request $request)
     {
         return response()->json($request->user());
     }
 
-    function editar(Request $request)
+    // 🔹 Editar dados
+    public function editar(Request $request)
     {
         $usuario = $request->user();
 
         $dados = $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $usuario->id,
-            'password' => 'nullable|string|min:6|confirmed'
+            'password' => 'nullable|string|min:6|confirmed',
+            'picture' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:15',
+            'enabled' => 'nullable|string|max:15',
+            'tipo' => 'nullable|string|max:255'
         ]);
 
         if (!empty($dados['password'])) {
-            $dados['password'] = bcrypt($dados['password']);
+            $dados['password'] = Hash::make($dados['password']);
         } else {
             unset($dados['password']);
         }
