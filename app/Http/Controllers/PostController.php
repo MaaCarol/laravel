@@ -2,65 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Listar todas as postagens
      */
     public function index()
     {
-        //
+        // Pega todos os posts do mais recente para o mais antigo
+        $posts = Post::with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json($posts);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Criar uma nova postagem
      */
-    public function create()
+    public function store(Request $request)
     {
-        //
-    }
+        // Validação do texto
+        $request->validate([
+            'conteudo' => 'required|string|max:500',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePostRequest $request)
-    {
-        //
-    }
+        // Cria o post associado ao usuário logado
+        $post = Post::create([
+            'conteudo' => $request->conteudo,
+            'user_id' => Auth::id(),
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Post $post)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePostRequest $request, Post $post)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Post $post)
-    {
-        //
+        return response()->json([
+            'message' => 'Post criado com sucesso!',
+            'post' => $post
+        ], 201);
     }
 }

@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->string('data', 255);
-            $table->string('description', 255);
-            $table->string('picture', 255);
+            $table->text('conteudo'); // texto da postagem
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // relação com usuário
+            $table->string('picture', 255)->nullable(); // opcional: imagem do post
+            $table->string('description', 255)->nullable(); // opcional: descrição extra
+            $table->timestamps(); // created_at e updated_at
         });
     }
 
